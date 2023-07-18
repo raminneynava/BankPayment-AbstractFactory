@@ -76,20 +76,20 @@ namespace AbstractFactory
             Saderat,
             Mellat
         }
-        private Dictionary<AvalableBank, IBankFactory> _factories=
-            new Dictionary<AvalableBank, IBankFactory> ();
+        private Dictionary<AvalableBank, IBankFactory> _factories =
+            new Dictionary<AvalableBank, IBankFactory>();
 
         public Payment()
         {
-            foreach(AvalableBank bank in Enum.GetValues(typeof(AvalableBank)))
+            foreach (AvalableBank bank in Enum.GetValues(typeof(AvalableBank)))
             {
-                var factory=(IBankFactory)Activator.CreateInstance(Type.GetType($"ConsoleApp5.{Enum.GetName(typeof(AvalableBank), bank)}Factory"));
+                var factory = (IBankFactory)Activator.CreateInstance(Type.GetType($"AbstractFactory.{Enum.GetName(typeof(AvalableBank), bank)}Factory"));
                 _factories.Add(bank, factory);
             }
         }
-        public IBank OrderPayment(AvalableBank bank,int orderid)
+        public IBank OrderPayment(AvalableBank bank, int orderid)
         {
-             return _factories[bank].order(orderid);
+            return _factories[bank].order(orderid);
         }
     }
 }

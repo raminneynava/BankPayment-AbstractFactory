@@ -6,7 +6,8 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp5
+namespace AbstractFactory
+
 {
     public interface IBank
     {

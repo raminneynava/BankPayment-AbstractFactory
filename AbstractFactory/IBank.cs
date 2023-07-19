@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,26 +72,41 @@ namespace AbstractFactory
     }
     public class Payment
     {
-        public enum AvalableBank
-        {
-            Meli,
-            Saderat,
-            Mellat
-        }
-        private Dictionary<AvalableBank, IBankFactory> _factories =
-            new Dictionary<AvalableBank, IBankFactory>();
-
+        private List<Tuple<string, IBankFactory>> _factories = new List<Tuple<string, IBankFactory>>();
         public Payment()
         {
-            foreach (AvalableBank bank in Enum.GetValues(typeof(AvalableBank)))
+
+            foreach (var type in typeof(Payment).Assembly.GetTypes())
             {
-                var factory = (IBankFactory)Activator.CreateInstance(Type.GetType($"AbstractFactory.{Enum.GetName(typeof(AvalableBank), bank)}Factory"));
-                _factories.Add(bank, factory);
+                if (typeof(IBankFactory).IsAssignableFrom(type) && !type.IsInterface)
+                {
+                    _factories.Add(Tuple.Create(type.Name.Replace("Factory", string.Empty),
+                        (IBankFactory)Activator.CreateInstance(type)
+                        ));
+                }
             }
         }
-        public IBank OrderPayment(AvalableBank bank, int orderid)
+        public IBank OrderPayment(out int orderid)
         {
-            return _factories[bank].order(orderid);
+            orderid = 0;
+            Console.WriteLine("Banks: ");
+            for (var index = 0; index < _factories.Count; index++)
+            {
+                var tuple = _factories[index];
+                Console.WriteLine($"{index}:{tuple.Item1}");
+            }
+
+            while (true)
+            {
+                string temp;
+                Console.WriteLine($"inter bank number:");
+                if ((temp = Console.ReadLine()) != null && int.TryParse(temp, out int index) && index >= 0 && index < _factories.Count)
+                {
+                    var order = _factories[index].Item2.order(orderid);
+                    return order;
+                }
+            }
+            return null;
         }
     }
 }
